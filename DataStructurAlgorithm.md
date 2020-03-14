@@ -434,25 +434,25 @@ def swapPairs(self, head):
 
 ```python
 def swapPairs(self, head):
-        if not head or not head.next:
-            return head
-        dummy = head
-        head = head.next
-        dummy.next = head.next
-        head.next = dummy
-        head.next.next = self.swapPairs(head.next.next)
-        return head
+	if not head or not head.next:
+	    return head
+	dummy = head
+	head = head.next
+	dummy.next = head.next
+	head.next = dummy
+	head.next.next = self.swapPairs(head.next.next)
+	return head
 ```
 
 ```python
-	def swapPairs(self, head):
-        if not head or not head.next:
-            return head
-        first=head.next
-        second=head
-        second.next=self.swapPairs(first.next)
-        first.next=second
-        return first
+def swapPairs(self, head):
+    if not head or not head.next:
+        return head
+    first=head.next
+    second=head
+    second.next=self.swapPairs(first.next)
+    first.next=second
+	return first
 ```
 
 ## 03 linked-list-cycle
@@ -603,6 +603,216 @@ def reverseKGroup(self, head, k):
     return dummy.next
 ```
 
+# stack
+
+## 01valid-parentheses
+
+### python
+
+```python
+ class Solution:
+        # @param {string} s
+        # @return {boolean}
+        def isValid(self, s):
+            stack=[]
+            for i in s:
+                if i in ['(','[','{']:
+                    stack.append(i)
+                else:
+                    if not stack or {')':'(',']':'[','}':'{'}[i]!=stack[-1]:
+                        return False
+                    stack.pop()
+            return not stack
+```
+
+
+
+```python
+def isValid(self, s):
+    stack, match = [], {')': '(', ']': '[', '}': '{'}
+    for ch in s:
+        if ch in match:
+            if not (stack and stack.pop() == match[ch]):
+                return False
+        else:
+            stack.append(ch)
+    return not stack
+```
+
+## 02 min-stack
+
+### python
+
+```python
+class MinStack:
+
+def __init__(self):
+    self.q = []
+
+# @param x, an integer
+# @return an integer
+def push(self, x):
+    curMin = self.getMin()
+    if curMin == None or x < curMin:
+        curMin = x
+    self.q.append((x, curMin));
+
+# @return nothing
+def pop(self):
+    self.q.pop()
+
+
+# @return an integer
+def top(self):
+    if len(self.q) == 0:
+        return None
+    else:
+        return self.q[len(self.q) - 1][0]
+
+
+# @return an integer
+def getMin(self):
+    if len(self.q) == 0:
+        return None
+    else:
+        return self.q[len(self.q) - 1][1]
+```
+
+## 03 largest-rectangle-in-histogram
+
+### python
+
+```python
+def largestRectangleArea(self, height):
+    height.append(0) # very important!!
+    stack = [-1]
+    ans = 0
+    for i in xrange(len(height)):
+        while height[i] < height[stack[-1]]:
+            h = height[stack.pop()]
+            w = i - stack[-1] - 1
+            ans = max(ans, h * w)
+        stack.append(i)
+    height.pop()
+    return ans
+```
+
+
+
+```python
+class Solution:
+    def largestRectangleArea(self, height):
+        n = len(height)
+        # left[i], right[i] represent how many bars are >= than the current bar
+        left = [1] * n
+        right = [1] * n
+        max_rect = 0
+        # calculate left
+        for i in range(0, n):
+            j = i - 1
+            while j >= 0:
+                if height[j] >= height[i]:
+                    left[i] += left[j]
+                    j -= left[j]
+                else: break
+        # calculate right
+        for i in range(n - 1, -1, -1):
+            j = i + 1
+            while j < n:
+                if height[j] >= height[i]:
+                    right[i] += right[j]
+                    j += right[j]
+                else: break
+        for i in range(0, n):
+            max_rect = max(max_rect, height[i] * (left[i] + right[i] - 1))
+        return max_rect
+```
+
+## 04 sliding-window-maximum
+
+### python
+
+```python
+class Solution(object):
+    def maxSlidingWindow(self, nums, k): #暴力
+        n=len(nums)
+        if n*k==0:
+            return []
+        return [max(nums[i:i+k])for i in range(n-k+1)]
+```
+
+
+
+```python
+def maxSlidingWindow(self, nums, k):
+    ans = []
+    queue = []
+    for i, v in enumerate(nums):
+        if queue and queue[0] <= i - k:
+            queue = queue[1:]
+        while queue and nums[queue[-1]] < v:
+            queue.pop()
+        queue.append(i)
+        if i + 1 >= k:
+            ans.append(nums[queue[0]])
+    return ans
+```
+
+```python
+def maxSlidingWindow(self, nums, k):
+    d = collections.deque()
+    out = []
+    for i, n in enumerate(nums):
+        while d and nums[d[-1]] < n:
+            d.pop()
+        d += i,
+        if d[0] == i - k:
+            d.popleft()
+        if i >= k - 1:
+            out += nums[d[0]],
+    return out
+```
+
+# 哈希表
+
+## 01 valid-anagram
+
+### python
+
+```python
+def isAnagram1(self, s, t):
+    dic1, dic2 = {}, {}
+    for item in s:
+        dic1[item] = dic1.get(item, 0) + 1
+    for item in t:
+        dic2[item] = dic2.get(item, 0) + 1
+    return dic1 == dic2
+    
+def isAnagram2(self, s, t):
+    dic1, dic2 = [0]*26, [0]*26
+    for item in s:
+        dic1[ord(item)-ord('a')] += 1
+    for item in t:
+        dic2[ord(item)-ord('a')] += 1
+    return dic1 == dic2
+    
+def isAnagram3(self, s, t):
+    return sorted(s) == sorted(t)
+```
+
+## 02group-anagrams
+
+### python
+
+```python
+def groupAnagrams(self, strs):
+    d = {}
+    for w in sorted(strs):
+        key = tuple(sorted(w))
+        d[key] = d.get(key, []) + [w]
+    return d.values()
+```
+
 
 
 # tree
@@ -610,8 +820,6 @@ def reverseKGroup(self, head, k):
 ## 01 binary-tree-inorder-traversal
 
 ### python
-
-
 
 ```python
 # recursively
